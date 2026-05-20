@@ -1,3 +1,33 @@
+from sklearn.datasets import load_wine
+wine = load_wine(as_frame=True)
+print(wine.DESCR)
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    wine.data, wine.target,test_size=0.3, random_state=42)
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import loguniform, uniform
+lin_clf=LinearSVC(max_iter=1_000_000, dual=True, random_state=42)
+lin_clf.fit(X_train, y_train)
+from sklearn.model_selection import cross_val_score
+cross_val_score(lin_clf, X_train, y_train).mean()
+lin_clf = make_pipeline(StandardScaler(),
+                        LinearSVC(dual=True, random_state=42))
+lin_clf.fit(X_train, y_train)
+cross_val_score(lin_clf, X_train, y_train).mean()
+svm_clf = make_pipeline(StandardScaler(), SVC(random_state=42))
+svm_clf.fit(X_train, y_train)
+cross_val_score(svm_clf, X_train, y_train).mean()
+param_distrib = {
+    "svc__gamma": loguniform(0.001, 0.1),
+    "svc__C": uniform(1, 10)
+}
+rnd_search_cv = RandomizedSearchCV(svm_clf, param_distrib, n_iter=100, cv=5,
+                                   random_state=42)
+rnd_search_cv.fit(X_train, y_train)
+rnd_search_cv.best_estimator_
+rnd_search_cv.best_score_
+rnd_search_cv.score(X_test, y_test)
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
