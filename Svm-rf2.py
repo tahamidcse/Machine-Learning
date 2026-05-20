@@ -34,6 +34,23 @@ from sklearn.pipeline import make_pipeline
 # Random Forest with basic parameters
 rf_clf = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_clf.fit(X_train, y_train)
+trees_to_show = [0, 1, 99]  # Python uses 0-based indexing
+feature_names = X_train.columns.tolist()
+class_names = ['No', 'Yes']
+n_trees_range = range(10, 201)
+oob_errors = [
+    1 - RandomForestClassifier(n_estimators=n, oob_score=True, random_state=42).fit(X_train, y_train).oob_score_
+    for n in n_trees_range
+]
+
+# Create a plot
+
+
+# Print results at key intervals
+print("OOB Error by Number of Trees:")
+for i, error in enumerate(oob_errors, 1):
+    if i % 10 == 0:
+        print(f"Trees: {i:3d}, OOB Error: {error:.4f}")
 
 # 4. Train SVM Classifier (with scaling)
 from sklearn.svm import SVC
