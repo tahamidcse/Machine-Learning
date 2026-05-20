@@ -152,3 +152,196 @@ if best_svm_accuracy > rf_accuracy:
     print("After tuning, SVM now outperforms Random Forest!")
 else:
     print(f"Even after tuning, Random Forest (accuracy: {rf_accuracy:.4f}) still performs better")Plot accuracy confmat classific score
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+class_report = classification_report(y_test, y_pred)
+accuracy_svm=accuracy_score(y_test,y_pred_svm)
+conf_matrix_svm=confusion_matrix(y_test,y_pred_svm)
+class_report_svm=classification_report(y_test,y_pred_svm)
+
+print("\n" + "="*60)
+print("PER CLASS PERFORMANCE")
+print("="*60)
+
+per_class_accuracy = conf_matrix.diagonal()/conf_matrix.sum(axis=1)
+
+for i, class_label in enumerate(rf_model.classes_):
+
+    print(f"\nClass {class_label}")
+    print(f"Accuracy: {per_class_accuracy[i]:.4f}")
+    print(f"Correct: {conf_matrix[i,i]}")
+    print(f"Total: {conf_matrix.sum(axis=1)[i]}")
+
+
+plt.figure(figsize=(8,6))
+
+plt.imshow(conf_matrix)
+
+plt.title("Confusion Matrix")
+plt.colorbar()
+
+plt.xticks(
+    range(len(rf_model.classes_)),
+    rf_model.classes_
+)
+
+plt.yticks(
+    range(len(rf_model.classes_)),
+    rf_model.classes_
+)
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+
+plt.show()
+
+print("\n" + "="*60)
+print("PER CLASS PERFORMANCE - SVM")
+print("="*60)
+
+per_class_accuracy_svm = (
+    conf_matrix_svm.diagonal() /
+    conf_matrix_svm.sum(axis=1)
+)
+
+for i, class_label in enumerate(final_svm.classes_):
+
+    print(f"\nClass {class_label}")
+    print(
+        f"Accuracy: "
+        f"{per_class_accuracy_svm[i]:.4f}"
+    )
+
+    print(
+        f"Correct: "
+        f"{conf_matrix_svm[i,i]}"
+    )
+
+    print(
+        f"Total: "
+        f"{conf_matrix_svm.sum(axis=1)[i]}"
+    )
+
+
+# ==================================================
+# SVM Confusion Matrix Visualization
+# ==================================================
+
+plt.figure(figsize=(8,6))
+
+plt.imshow(
+    conf_matrix_svm,
+    cmap='Blues'
+)
+
+plt.title("Confusion Matrix - SVM")
+
+plt.colorbar()
+
+plt.xticks(
+    range(len(final_svm.classes_)),
+    final_svm.classes_
+)
+
+plt.yticks(
+    range(len(final_svm.classes_)),
+    final_svm.classes_
+)
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+
+for i in range(conf_matrix_svm.shape[0]):
+    for j in range(conf_matrix_svm.shape[1]):
+
+        plt.text(
+            j,
+            i,
+            conf_matrix_svm[i,j],
+            ha='center',
+            va='center'
+        )
+
+plt.show()
+
+
+
+
+
+from sklearn.model_selection import cross_val_score
+# ==================================================
+# Average confidence Random Forest
+# ==================================================
+avg_confidence = np.mean(
+    np.max(y_pred_proba, axis=1)
+)
+
+print("\nAverage confidence:",
+      f"{avg_confidence:.4f}")
+
+# ==================================================
+# Cross validation
+# ==================================================
+
+print("\n" + "="*60)
+print("CROSS VALIDATION")
+print("="*60)
+
+cv_scores = cross_val_score(
+    rf_model,
+    X_train,
+    y_train,
+    cv=5
+)
+
+print("Scores:", cv_scores)
+print(
+    f"Mean:{cv_scores.mean():.4f}"
+)
+print(
+    f"Std:{cv_scores.std():.4f}"
+)
+
+from sklearn.model_selection import cross_val_score
+from sklearn.svm import SVC
+
+# ==================================================
+# Average confidence
+# ==================================================
+
+avg_confidence_svm = np.mean(
+    np.max(y_pred_proba_svm, axis=1)
+)
+
+print(
+    "\nAverage confidence:",
+    f"{avg_confidence_svm:.4f}"
+)
+
+# ==================================================
+# Cross validation
+# ==================================================
+
+print("\n" + "="*60)
+print("SVM CROSS VALIDATION")
+print("="*60)
+
+cv_scores_svm = cross_val_score(
+    svm_model,
+    X_train,
+    y_train,
+    cv=5
+)
+
+print(
+    "Scores:",
+    cv_scores_svm
+)
+
+print(
+    f"Mean:{cv_scores_svm.mean():.4f}"
+)
+
+print(
+    f"Std:{cv_scores_svm.std():.4f}"
+)
